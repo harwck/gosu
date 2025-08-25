@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - main
   workflow_dispatch:
 
 defaults:
@@ -18,30 +19,25 @@ jobs:
     name: Auto Tag
     runs-on: ubuntu-latest
     outputs:
-      tagcreated: ${{ steps.autotag.outputs.tagcreated }}
-      tagname: ${{ steps.autotag.outputs.tagname }}
-      version: ${{ steps.autotag.outputs.version }}
+      version: ${{ steps.bump-version.outputs.newTag }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Auto Tag
-        id: autotag
-        uses: butlerlogic/action-autotag@stable
+      - name: Bump Version
+        id: bump-version
+        uses: 'phips28/gh-action-bump-version@master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          strategy: regex
-          root: version.go
-          regex_pattern: 'const Version = "(?<version>\d+\.\d+\.\d+)"'
-          tag_prefix: "v"
+          version-type:  'patch'
 
   build:
     name: Build Binaries
     runs-on: ubuntu-latest
     needs: autotag
-    if: needs.autotag.outputs.tagcreated == 'yes'
+    if: needs.autotag.outputs.version != ''
     steps:
       - uses: actions/checkout@v4
 
@@ -53,7 +49,6 @@ jobs:
       - name: Display version information
         run: |
           echo "Building for version: ${{ needs.autotag.outputs.version }}"
-          echo "Tag created: ${{ needs.autotag.outputs.tagname }}"
           grep "const Version" version.go
 
       - name: Build for amd64
@@ -93,7 +88,7 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     needs: [autotag, build]
-    if: needs.autotag.outputs.tagcreated == 'yes'
+    if: needs.autotag.outputs.version != ''
     steps:
       - uses: actions/checkout@v4
 
@@ -108,11 +103,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ needs.autotag.outputs.tagname }}
-          release_name: Release ${{ needs.autotag.outputs.tagname }}
+          tag_name: ${{ needs.autotag.outputs.version }}
+          release_name: Release ${{ needs.autotag.outputs.version }}
           body: |
-            ## Changes in ${{ needs.autotag.outputs.tagname }}
-            
+            ## Changes in ${{ needs.autotag.outputs.version }}
+
             This release was automatically generated from the latest commits to master.
             
             ### Assets
@@ -123,12 +118,12 @@ jobs:
             ### Installation
             ```bash
             # For amd64
-            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.tagname }}/gosu-x86_64
+            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.version }}/gosu-x86_64
             chmod +x gosu-x86_64
             sudo mv gosu-x86_64 /usr/local/bin/gosu
             
             # For arm64
-            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.tagname }}/gosu-aarch64
+            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.version }}/gosu-aarch64
             chmod +x gosu-aarch64
             sudo mv gosu-aarch64 /usr/local/bin/gosu
             ```
