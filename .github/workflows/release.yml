@@ -56,7 +56,7 @@ jobs:
 
       - name: Build for amd64
         run: |
-          go build -v -trimpath -ldflags '-d -w' -o gosu-x86_64
+          go build -v -trimpath -ldflags '-s -w' -o gosu-x86_64
         env:
           CGO_ENABLED: 0
           GOOS: linux
@@ -65,7 +65,7 @@ jobs:
 
       - name: Build for arm64
         run: |
-          go build -v -trimpath -ldflags '-d -w' -o gosu-aarch64
+          go build -v -trimpath -ldflags '-s -w' -o gosu-aarch64
         env:
           CGO_ENABLED: 0
           GOOS: linux
