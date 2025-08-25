@@ -22,19 +22,24 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'main'
     outputs:
-      version: ${{ steps.bump-version.outputs.newTag }}
+      version: ${{ steps.bump-version.outputs.new_tag }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Bump Version
+      - name: Bump version
         id: bump-version
-        uses: 'phips28/gh-action-bump-version@master'
+        uses: anothrNick/github-tag-action@1.75.0
         env:
+          DEFAULT_BRANCH: master
+          DRY_RUN: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          version-type:  'patch'
+          WITH_V: true
+          PRERELEASE: true
+          PRERELEASE_SUFFIX: rc-${{ github.run_number }}
+          RELEASE_BRANCHES: master
+          TAG_CONTEXT: branch
 
   build:
     name: Build Binaries
