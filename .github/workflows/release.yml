@@ -116,21 +116,21 @@ jobs:
             This release was automatically generated from the latest commits to master.
             
             ### Assets
-            - `gosu-amd64`: Linux amd64 binary
-            - `gosu-arm64`: Linux arm64 binary
+            - `gosu-x86_64`: Linux amd64 binary
+            - `gosu-aarch64`: Linux arm64 binary
             - `SHA256SUMS`: Checksums for all binaries
             
             ### Installation
             ```bash
             # For amd64
-            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.tagname }}/gosu-amd64
-            chmod +x gosu-amd64
-            sudo mv gosu-amd64 /usr/local/bin/gosu
+            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.tagname }}/gosu-x86_64
+            chmod +x gosu-x86_64
+            sudo mv gosu-x86_64 /usr/local/bin/gosu
             
             # For arm64
-            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.tagname }}/gosu-arm64
-            chmod +x gosu-arm64
-            sudo mv gosu-arm64 /usr/local/bin/gosu
+            wget https://github.com/${{ github.repository }}/releases/download/${{ needs.autotag.outputs.tagname }}/gosu-aarch64
+            chmod +x gosu-aarch64
+            sudo mv gosu-aarch64 /usr/local/bin/gosu
             ```
           draft: false
           prerelease: false
@@ -141,8 +141,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gosu-amd64
-          asset_name: gosu-amd64
+          asset_path: ./gosu-x86_64
+          asset_name: gosu-x86_64
           asset_content_type: application/octet-stream
 
       - name: Upload arm64 binary
@@ -151,8 +151,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gosu-arm64
-          asset_name: gosu-arm64
+          asset_path: ./gosu-aarch64
+          asset_name: gosu-aarch64
           asset_content_type: application/octet-stream
 
       - name: Upload checksums
