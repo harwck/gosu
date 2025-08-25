@@ -1,7 +1,9 @@
 name: Release
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - master
       - main
@@ -18,6 +20,7 @@ jobs:
   autotag:
     name: Auto Tag
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'main'
     outputs:
       version: ${{ steps.bump-version.outputs.newTag }}
     steps:
