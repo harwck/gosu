@@ -1,0 +1,35 @@
+name: "Request Review for Dependabot PRs"
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches: 
+      - master
+
+permissions:
+  pull-requests: write
+
+jobs:
+  request-review:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request review from repo owner
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              reviewers: ['${{ github.event.pull_request.head.repo.owner.login }}']
+            });
+            
+            // Optionally add a comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '🤖 Dependabot PR detected. Review requested from @${{ github.event.pull_request.head.repo.owner.login }}'
+            });
