@@ -4,6 +4,8 @@ on:
   pull_request:
     types:
       - opened
+    branches: 
+      - master
 
 permissions:
   pull-requests: write
