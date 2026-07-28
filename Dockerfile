@@ -1,4 +1,4 @@
-FROM golang:1.25-trixie
+FROM golang:1.26.5-trixie
 
 RUN set -eux; \
 	apt-get update; \
